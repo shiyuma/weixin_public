@@ -8,6 +8,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
+#公众号名称和对应js连接的字典
 js_list={u'知影':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt6Ltxtwbmm6eQaBtwArtHi8&eqs=ZVsXolcgGwFLoGrnF%2BxpUuF9F9O305uJGXCQ3nIot8f95%2BD2G0%2Fd6w4QjhQUJr1fUAsAT&ekv=7&page=1',
            u'良仓':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt9aE-GHf7Ne-t4i4bOhE3Go&eqs=Qmsoo7wgR%2FElop0BVF8WYumX2F9NE7wXMTJ7Cc1UWOmvCBFYt%2BdZk83wXIMXwv0P6hQ80&ekv=7&page=1' ,
          u'健身先健脑':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt6kiQvot0lv-G4yXtsV6aGQ&eqs=HUsGoKMgoq90o2DAQMmoEuYAf5f2Cb%2FP75qfnxWiVc%2FAHo5K8I4HE3sqZkVoRxc8W8Jgb&ekv=7&page=1',
@@ -16,6 +17,7 @@ js_list={u'知影':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=
         u'数据挖掘DW':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFtwUwT3YLdH8NLEW7Txt3rFk&eqs=HSs2ojAgtDtkovIt85c6ruHQIaNpu2R8einYws0x1Rn7CZHvIsVC4aOE6aosbN3mgwQHu&ekv=7&page=1',
          }
 
+#公众号名称与公众号id的字典
 openid_list={u'知影':u'oIWsFt6Ltxtwbmm6eQaBtwArtHi8',
                 u'良仓':u'oIWsFt9aE-GHf7Ne-t4i4bOhE3Go',
              u'健身先健脑':u'oIWsFt6kiQvot0lv-G4yXtsV6aGQ',
@@ -28,6 +30,7 @@ template_1 = re.compile(r'\[CDATA\[http://mp.*?\]')
 template_2 = re.compile(r'http://mp.*[^]]')
 dic = {}
 
+#检查公众号和对应文章是否已经存在数据库
 def check_article_exist(open_id, want_article):
     try:
         wp = pymysql.connect(host='localhost',user='test',passwd='test',db='newdb',charset='utf8')
@@ -53,12 +56,14 @@ def insert_record(open_id, want_article):
         wp.close()
         print "insert failed :cannt connect to mysql"
 
+#通过解析文章获取文章标题
 def get_article_name(link):
     r = requests.get(link)
     soup = BeautifulSoup(r.text)
     title = soup.h2.contents[0].title()
     return title
 
+#将解析文章写入html保存
 def write_link_to_html(link,name):
     wholename = 'email_store/'+ name +'.html'
     res = requests.get(link)
@@ -79,7 +84,7 @@ def write_link_to_html(link,name):
 
     print 'write '+wholename+' already.'
 
-
+#发送对应文章的email
 def send_email(name):
     wholename = 'email_store/'+ name +'.html'
     fromaddr = "353350024@qq.com"
@@ -97,6 +102,7 @@ def send_email(name):
     server.sendmail(fromaddr, toaddr, text)
     print "send"+name+"successfully"
 
+#主函数
 def main():
     for name in js_list.keys():
         dic.setdefault(name,[])
