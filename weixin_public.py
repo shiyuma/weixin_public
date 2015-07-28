@@ -15,6 +15,8 @@ js_list={u'知影':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=
          u'财新Enjoy雅趣':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFtyM57IXJydxDq7e2dfI5DWo&eqs=UxsioUig1h%2FroW9pD1%2FeuuzNCnCc%2FBwW%2FW%2B9zOC3asJ%2FEsp5JXZBQZj%2FOXiBO5TFZyrUs&ekv=7&page=1',
          u'Python开发者':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt5QBSP8mn4Jx2WSGw_rCNzQ&eqs=qhs9oUAgGopVo4ijtfSaguT9nMY9WgKrTYOtMi6qXbD4llISIT%2BG6aKYFIXisCp52igTG&ekv=7&page=1',
         u'数据挖掘DW':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFtwUwT3YLdH8NLEW7Txt3rFk&eqs=HSs2ojAgtDtkovIt85c6ruHQIaNpu2R8einYws0x1Rn7CZHvIsVC4aOE6aosbN3mgwQHu&ekv=7&page=1',
+        u'好奇心日报':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt5vznVWdVAk9hw4dsXVj5y8&eqs=wFsGolrgKUOHoqEbBGTKouldkqP54Hevk3vq7jtontQlre4yTHHZcfR9pTt5IZDYuFNAp&ekv=7&page=1',
+         u'小道消息':u'http://weixin.sogou.com/gzhjs?cb=sogou.weixin.gzhcb&openid=oIWsFt86NKeSGd_BQKp1GcDkYpv0&eqs=tUsYo8OgE6twomWXaQdVku7NKxnk2wEmdNj6ZkctDPsSYcedigs324KsshDZJ5q7I%2FMZr&ekv=7&page=1',
          }
 
 #公众号名称与公众号id的字典
@@ -24,6 +26,8 @@ openid_list={u'知影':u'oIWsFt6Ltxtwbmm6eQaBtwArtHi8',
              u'财新Enjoy雅趣':u'oIWsFtyM57IXJydxDq7e2dfI5DWo',
              u'Python开发者':u'oIWsFt5QBSP8mn4Jx2WSGw_rCNzQ',
             u'数据挖掘DW':u'oIWsFtwUwT3YLdH8NLEW7Txt3rFk',
+            u'好奇心日报':u'oIWsFt5vznVWdVAk9hw4dsXVj5y8',
+             u'小道消息':u'oIWsFt86NKeSGd_BQKp1GcDkYpv0',
              }
 
 template_1 = re.compile(r'\[CDATA\[http://mp.*?\]')
@@ -59,9 +63,12 @@ def insert_record(open_id, want_article):
 #通过解析文章获取文章标题
 def get_article_name(link):
     r = requests.get(link)
-    soup = BeautifulSoup(r.text)
-    title = soup.h2.contents[0].title()
-    return title
+    try:
+        soup = BeautifulSoup(r.text)
+        title = soup.h2.contents[0].title()
+        return title
+    except:
+        print "内容错误,无法抓取"
 
 #将解析文章写入html保存
 def write_link_to_html(link,name):
@@ -117,7 +124,7 @@ def main():
     for name in dic.keys():
         open_id = openid_list[name]
         link_list = dic[name]
-        for want_link in link_list[0:5]:
+        for want_link in link_list:
             want_article = get_article_name(want_link)
             if not check_article_exist(open_id,want_article):
                 insert_record(open_id,want_article)
@@ -129,19 +136,3 @@ def main():
 
 
 
-
-
-
-
-
-
-# with open("test.html", 'w+') as w:
-#     w.write(html_public.read())
-#
-# soup = BeautifulSoup(html_public)
-#
-# res = soup.find('div', {'class', 'results'})
-# lst = soup.findAll('div', {'id', 'sogou_vr_11002601_box_0'})
-# if lst:
-#     for content in lst:
-#         print content
