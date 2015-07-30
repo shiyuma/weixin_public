@@ -63,12 +63,10 @@ def insert_record(open_id, want_article):
 #通过解析文章获取文章标题
 def get_article_name(link):
     r = requests.get(link)
-    try:
-        soup = BeautifulSoup(r.text)
-        title = soup.h2.contents[0].title()
-        return title
-    except:
-        print "内容错误,无法抓取"
+    soup = BeautifulSoup(r.text)
+    title = soup.h2.contents[0].title()
+    return title
+
 
 #将解析文章写入html保存
 def write_link_to_html(link,name):
@@ -125,7 +123,10 @@ def main():
         open_id = openid_list[name]
         link_list = dic[name]
         for want_link in link_list:
-            want_article = get_article_name(want_link)
+            try:
+                want_article = get_article_name(want_link)
+            except:
+                continue
             if not check_article_exist(open_id,want_article):
                 insert_record(open_id,want_article)
                 write_link_to_html(want_link,want_article)
